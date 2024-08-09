@@ -2,18 +2,119 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
+favorite_planet = db.Table('favorite_planet',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('planet_id', db.Integer, db.ForeignKey('planet.id'), primary_key=True)
+)
+
+
+favorite_character = db.Table('favorite_character',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('character_id', db.Integer, db.ForeignKey('character.id'), primary_key=True)
+)
+
+
+favorite_vehicle = db.Table('favorite_vehicle',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('vehicle_id', db.Integer, db.ForeignKey('vehicle.id'), primary_key=True)
+)
+
+
+
+
 class User(db.Model):
+
+
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    user_name = db.Column(db.String(250), unique=True, nullable=False)
+    email = db.Column(db.String(250), unique=True, nullable=False)
+    password = db.Column(db.String(250), nullable=False)
+   
+   
+    favorite_planet = db.relationship('Planet', secondary='favorite_planet', backref=db.backref('user'))
+    favorite_character = db.relationship('Character', secondary='favorite_character', backref=db.backref('user'))
+    favorite_vehicle = db.relationship('Vehicle', secondary='favorite_vehicle', backref=db.backref('user'))
+
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User %r>' % self.email
+
 
     def serialize(self):
         return {
             "id": self.id,
+            "user_name": self.user_name,
             "email": self.email,
-            # do not serialize the password, its a security breach
         }
+
+
+class Planet(db.Model):
+   
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250), nullable=False)
+    climate = db.Column(db.String(250))
+    terrain = db.Column(db.String(250))
+    population = db.Column(db.Integer)
+   
+    def __repr__(self):
+        return '<Planet %r>' % self.name
+
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name":self.name,
+            "climate": self.climate,
+            "terrain":self.terrain,
+            "population":self.population,
+    }
+
+
+
+
+class Character(db.Model):
+   
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250), nullable=False)
+    species = db.Column(db.String(250))
+    homeworld = db.Column(db.String(250))
+   
+    def __repr__(self):
+        return '<Character %r>' % self.name
+
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name":self.name,
+            "species": self.species,
+            "homeworld":self.homeworld,
+    }
+
+
+
+
+class Vehicle(db.Model):
+   
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250), nullable=False)
+    model = db.Column(db.String(250))
+    hp = db.Column(db.Integer)
+   
+   
+   
+   
+    def __repr__(self):
+        return '<Vehicle %r>' % self.name
+
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name":self.name,
+            "model": self.model,
+            "hp":self.hp,
+    }
+
+
