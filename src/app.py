@@ -63,6 +63,56 @@ def get_planets():
 def get_planet(planet_id):
     planet = Planet.query.get_or_404(planet_id)
     return jsonify(planet.serialize()), 200
+# Agregar un nuevo planeta
+@app.route('/planets', methods=['POST'])
+def add_planet():
+    data = request.get_json()
+    name = data.get('name')
+    climate = data.get('climate')
+    terrain = data.get('terrain')
+    population = data.get('population')
+
+    if not name:
+        return jsonify({"msg": "Name is required"}), 400
+
+    new_planet = Planet(name=name, climate=climate, terrain=terrain, population=population)
+    db.session.add(new_planet)
+    db.session.commit()
+
+    return jsonify(new_planet.serialize()), 201
+
+# Eliminar un planeta existente
+@app.route('/planets/<int:planet_id>', methods=['DELETE'])
+def delete_planet(planet_id):
+    planet = Planet.query.get_or_404(planet_id)
+    db.session.delete(planet)
+    db.session.commit()
+    return jsonify({"msg": "Planet deleted"}), 200
+
+# Agregar un nuevo personaje
+@app.route('/people', methods=['POST'])
+def add_person():
+    data = request.get_json()
+    name = data.get('name')
+    species = data.get('species')
+    homeworld = data.get('homeworld')
+
+    if not name:
+        return jsonify({"msg": "Name is required"}), 400
+
+    new_character = Character(name=name, species=species, homeworld=homeworld)
+    db.session.add(new_character)
+    db.session.commit()
+
+    return jsonify(new_character.serialize()), 201
+
+# Eliminar un personaje existente
+@app.route('/people/<int:character_id>', methods=['DELETE'])
+def delete_person(character_id):
+    character = Character.query.get_or_404(character_id)
+    db.session.delete(character)
+    db.session.commit()
+    return jsonify({"msg": "Character deleted"}), 200
 
 #LISTAR USUARIOS
 @app.route('/users',methods=['GET'])
